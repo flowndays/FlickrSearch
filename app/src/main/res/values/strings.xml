@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FlickrSearch</string>
+    <string name="no_result_found">No result is found</string>
+    <string name="error_searching_photoes">Oops, something went wrong</string>
+    <string name="search">search</string>
+    <string name="search_hint">search photos</string>
+</resources>
