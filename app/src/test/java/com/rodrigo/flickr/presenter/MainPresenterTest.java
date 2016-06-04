@@ -53,7 +53,7 @@ public class MainPresenterTest {
     public void searchPhotosShouldAppendPhotos_withResults() {
         String keyword = "kittens";
         PhotosResponse photosResponse = MockModel.mockSearchResult(10);
-        when(searchService.searchPhotoes(keyword))
+        when(searchService.searchPhotos(keyword, 0))
                 .thenReturn(Observable.just(photosResponse));
 
         mainPresenter.searchPhotos(keyword);
@@ -65,7 +65,7 @@ public class MainPresenterTest {
     public void searchPhotosShouldShowMessage_withNoResult() {
         String keyword = "kittens";
         PhotosResponse photosResponse = MockModel.mockEmptyResult();
-        when(searchService.searchPhotoes(keyword))
+        when(searchService.searchPhotos(keyword, 0))
                 .thenReturn(Observable.just(photosResponse));
 
         mainPresenter.searchPhotos(keyword);
@@ -77,7 +77,7 @@ public class MainPresenterTest {
     public void searchPhotosShouldShowErrorMessage_withError() {
         String keyword = "kittens";
         PhotosResponse photosResponse = MockModel.mockErrorResult();
-        when(searchService.searchPhotoes(keyword))
+        when(searchService.searchPhotos(keyword, 0))
                 .thenReturn(Observable.just(photosResponse));
 
         mainPresenter.searchPhotos(keyword);

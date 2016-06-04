@@ -44,7 +44,7 @@ public class MainPresenter implements Presenter<MainMvpView> {
         if (subscription != null) subscription.unsubscribe();
         MyApplication application = MyApplication.get(mainMvpView.getContext());
         SearchService searchService = application.getSearchService();
-        subscription = searchService.searchPhotoes(key)
+        subscription = searchService.searchPhotos(key, 0)
                 .doOnNext(response -> {
                     if (!response.isSucceed()) {
                         throw new RuntimeException("search failed for unknown error");

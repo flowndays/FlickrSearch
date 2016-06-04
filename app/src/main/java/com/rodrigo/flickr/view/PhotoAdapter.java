@@ -10,18 +10,25 @@ import android.widget.ImageView;
 import com.rodrigo.flickr.R;
 import com.rodrigo.flickr.model.Photo;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
     private final List<Photo> photoList = new ArrayList<>();
+    private int fixedWidth;
+    private int fixedHeight;
+
+    public void setFixedSizeInPixels(int fixedWidth, int fixedHeight) {
+        this.fixedWidth = fixedWidth;
+        this.fixedHeight = fixedHeight;
+    }
 
     public void addPhotos(List<Photo> photos) {
         photoList.addAll(photos);
         notifyDataSetChanged();
     }
-
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,7 +42,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
         Photo photo = photoList.get(position);
         Context context = holder.imageView.getContext();
-        Picasso.with(context).load(createPhotoUrl(photo)).into(holder.imageView);
+        RequestCreator requestCreator = Picasso.with(context).load(createPhotoUrl(photo));
+        if (fixedWidth > 0 && fixedHeight > 0) {
+            requestCreator.resize(fixedWidth, fixedHeight);
+        }
+        requestCreator.into(holder.imageView);
     }
 
     private String createPhotoUrl(Photo photo) {

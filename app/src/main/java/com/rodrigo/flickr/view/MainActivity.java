@@ -59,7 +59,11 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         resultGrid.setLayoutManager(new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL,
                 false));
         photoAdapter = new PhotoAdapter();
-        resultGrid.addItemDecoration(new GridSpacingItemDecoration(3, 50));
+        photoAdapter.setFixedSizeInPixels(
+                getResources().getDimensionPixelSize(R.dimen.photo_width),
+                getResources().getDimensionPixelSize(R.dimen.photo_height));
+        resultGrid.setHasFixedSize(true);
+        resultGrid.addItemDecoration(new GridSpacingItemDecoration(3, 10));
         resultGrid.setAdapter(photoAdapter);
     }
 
