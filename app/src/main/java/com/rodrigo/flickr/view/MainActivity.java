@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 import com.rodrigo.flickr.R;
 import com.rodrigo.flickr.model.Photo;
 import com.rodrigo.flickr.presenter.MainPresenter;
+import com.rodrigo.flickr.view.wedget.SwipeRefreshLayoutBottom;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     private TextView messageView;
     private RecyclerView resultGrid;
     private PhotoAdapter photoAdapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayoutBottom swipeRefreshLayout;
 
     private String keyword;
 
@@ -62,22 +62,15 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         setupResultGrid();
         messageView = (TextView) findViewById(R.id.message);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = (SwipeRefreshLayoutBottom) findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             if (!TextUtils.isEmpty(keyword)) {
-                presenter.resetPage();
                 presenter.searchPhotos(keyword);
             } else {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
-
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            keyword = intent.getStringExtra(SearchManager.QUERY);
-            presenter.searchPhotos(keyword);
-        }
     }
 
     private void setupResultGrid() {
@@ -90,23 +83,6 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         resultGrid.setHasFixedSize(true);
         resultGrid.addItemDecoration(new GridSpacingItemDecoration(3, 10));
         resultGrid.setAdapter(photoAdapter);
-
-        resultGrid.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    int visibleItemCount = resultGrid.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-
-                    if (!presenter.isLoading()) {
-                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount - visibleItemCount) {
-                            presenter.searchPhotos(keyword);
-                        }
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -139,16 +115,14 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
     @Override
     public void showMessage(int stringId) {
-        swipeRefreshLayout.setVisibility(View.GONE);
-        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(false));
+        swipeRefreshLayout.setRefreshing(false);
         messageView.setVisibility(View.VISIBLE);
         messageView.setText(stringId);
     }
 
     @Override
     public void showProgressIndicator() {
-        swipeRefreshLayout.setVisibility(View.VISIBLE);
-        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true));
+        swipeRefreshLayout.setRefreshing(true);
         messageView.setVisibility(View.GONE);
     }
 

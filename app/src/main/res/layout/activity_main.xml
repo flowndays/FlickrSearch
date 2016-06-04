@@ -35,7 +35,7 @@
             android:layout_gravity="center"
             android:text="@string/search_from_action_menu"/>
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <com.rodrigo.flickr.view.wedget.SwipeRefreshLayoutBottom
             android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -46,6 +46,6 @@
                 android:layout_height="match_parent"
                 android:layout_margin="16dp"
                 />
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </com.rodrigo.flickr.view.wedget.SwipeRefreshLayoutBottom>
     </FrameLayout>
 </android.support.constraint.ConstraintLayout>

@@ -92,7 +92,4 @@ public class MainPresenter implements Presenter<MainMvpView> {
         return responseOfCurrentPage == null ? 0 : responseOfCurrentPage.nextPage();
     }
 
-    public boolean isLoading() {
-        return isLoading;
-    }
 }
