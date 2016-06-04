@@ -27,11 +27,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MainMvpView {
 
     private MainPresenter presenter;
-    private Toolbar toolbar;
     private ProgressBar progressBar;
     private TextView messageView;
     private RecyclerView resultGrid;
     private PhotoAdapter photoAdapter;
+
+    private String keyword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         presenter.attachView(this);
 
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         resultGrid = (RecyclerView) findViewById(R.id.search_result_grid);
@@ -50,14 +51,14 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String keyword = intent.getStringExtra(SearchManager.QUERY);
+            keyword = intent.getStringExtra(SearchManager.QUERY);
             presenter.searchPhotos(keyword);
         }
     }
 
     private void setupResultGrid() {
-        resultGrid.setLayoutManager(new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL,
-                false));
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
+        resultGrid.setLayoutManager(layoutManager);
         photoAdapter = new PhotoAdapter();
         photoAdapter.setFixedSizeInPixels(
                 getResources().getDimensionPixelSize(R.dimen.photo_width),
@@ -65,6 +66,23 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         resultGrid.setHasFixedSize(true);
         resultGrid.addItemDecoration(new GridSpacingItemDecoration(3, 10));
         resultGrid.setAdapter(photoAdapter);
+
+        resultGrid.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    int visibleItemCount = resultGrid.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                    if (!presenter.isLoading()) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount - visibleItemCount) {
+                            presenter.searchPhotos(keyword);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
