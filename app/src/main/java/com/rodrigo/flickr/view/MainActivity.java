@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     @Override
     public void setPhotos(List<Photo> images) {
         photoAdapter.setPhotos(images);
+        resultGrid.scrollToPosition(0);
         swipeRefreshLayout.setRefreshing(false);
         messageView.setVisibility(View.GONE);
     }
