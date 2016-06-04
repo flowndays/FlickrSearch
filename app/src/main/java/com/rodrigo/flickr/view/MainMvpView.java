@@ -8,6 +8,8 @@ public interface MainMvpView extends MvpView {
 
     void appendPhotos(List<Photo> images);
 
+    void setPhotos(List<Photo> images);
+
     void showMessage(int stringId);
 
     void showProgressIndicator();

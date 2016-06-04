@@ -25,6 +25,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         this.fixedHeight = fixedHeight;
     }
 
+    public void setPhotos(List<Photo> photos) {
+        photoList.clear();
+        photoList.addAll(photos);
+        notifyDataSetChanged();
+    }
+
     public void addPhotos(List<Photo> photos) {
         photoList.addAll(photos);
         notifyDataSetChanged();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.rodrigo.flickr.R;
@@ -27,10 +27,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MainMvpView {
 
     private MainPresenter presenter;
-    private ProgressBar progressBar;
     private TextView messageView;
     private RecyclerView resultGrid;
     private PhotoAdapter photoAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private String keyword;
 
@@ -47,7 +47,13 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         resultGrid = (RecyclerView) findViewById(R.id.search_result_grid);
         setupResultGrid();
         messageView = (TextView) findViewById(R.id.message);
-        progressBar = (ProgressBar) findViewById(R.id.progress);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            presenter.resetPage();
+            presenter.searchPhotos(keyword);
+        });
 
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -102,20 +108,29 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     @Override
     public void appendPhotos(List<Photo> images) {
         photoAdapter.addPhotos(images);
-        progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
+        messageView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setPhotos(List<Photo> images) {
+        photoAdapter.setPhotos(images);
+        swipeRefreshLayout.setRefreshing(false);
         messageView.setVisibility(View.GONE);
     }
 
     @Override
     public void showMessage(int stringId) {
-        progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setVisibility(View.GONE);
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(false));
         messageView.setVisibility(View.VISIBLE);
         messageView.setText(stringId);
     }
 
     @Override
     public void showProgressIndicator() {
-        progressBar.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true));
         messageView.setVisibility(View.GONE);
     }
 

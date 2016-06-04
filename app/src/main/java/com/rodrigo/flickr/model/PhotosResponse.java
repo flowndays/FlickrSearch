@@ -55,6 +55,10 @@ public class PhotosResponse {
         return photos.page + 1;
     }
 
+    public boolean isFirstPage() {
+        return photos.page == 0;
+    }
+
     @NonNull
     public List<Photo> getPhotos() {
         return photos.photoList == null ? Collections.emptyList() : photos.photoList;

@@ -32,6 +32,10 @@ public class MainPresenter implements Presenter<MainMvpView> {
         if (subscription != null) subscription.unsubscribe();
     }
 
+    public void resetPage() {
+        responseOfCurrentPage = null;
+    }
+
     public void searchPhotos(String keyword) {
         String key = keyword.trim();
         if (key.isEmpty() || isLoading) {
@@ -59,7 +63,11 @@ public class MainPresenter implements Presenter<MainMvpView> {
                     public void onCompleted() {
                         Log.i(TAG, "Search result: " + responseOfCurrentPage);
                         if (!responseOfCurrentPage.getPhotos().isEmpty()) {
-                            mainMvpView.appendPhotos(responseOfCurrentPage.getPhotos());
+                            if (responseOfCurrentPage.isFirstPage()) {
+                                mainMvpView.setPhotos(responseOfCurrentPage.getPhotos());
+                            } else {
+                                mainMvpView.appendPhotos(responseOfCurrentPage.getPhotos());
+                            }
                         } else {
                             mainMvpView.showMessage(R.string.no_result_found);
                         }
