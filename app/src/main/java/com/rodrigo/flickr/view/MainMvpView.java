@@ -4,7 +4,7 @@ import com.rodrigo.flickr.model.Photo;
 
 import java.util.List;
 
-public interface MainMvpView extends MvpView {
+public interface MainMvpView {
 
     void appendPhotos(List<Photo> images);
 

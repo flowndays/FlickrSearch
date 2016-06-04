@@ -1,35 +1,61 @@
 package com.rodrigo.flickr.presenter;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.rodrigo.flickr.MyApplication;
 import com.rodrigo.flickr.R;
+import com.rodrigo.flickr.model.Photo;
 import com.rodrigo.flickr.model.PhotosResponse;
 import com.rodrigo.flickr.model.SearchService;
 import com.rodrigo.flickr.view.MainMvpView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
-public class MainPresenter implements Presenter<MainMvpView> {
+/**
+ * Non-UI Fragment serving as a Presenter in MVP model.
+ */
+public class MainPresenter extends Fragment {
 
     public static String TAG = "MainPresenter";
 
     private MainMvpView mainMvpView;
     private Subscription subscription;
+    private List<Photo> allPhotoList = new ArrayList<>();
     private PhotosResponse responseOfCurrentPage;
     private boolean isLoading = false;
 
     @Override
-    public void attachView(MainMvpView view) {
-        this.mainMvpView = view;
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
-    public void detachView() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainMvpView = (MainMvpView) getActivity();
+    }
+
+    @Override
+    public void onDetach() {
         this.mainMvpView = null;
-        if (subscription != null) subscription.unsubscribe();
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+        super.onDetach();
+    }
+
+    public List<Photo> getAllPhotoList() {
+        return allPhotoList;
     }
 
     public void resetPage() {
@@ -48,7 +74,7 @@ public class MainPresenter implements Presenter<MainMvpView> {
         }
 
         isLoading = true;
-        MyApplication application = MyApplication.get(mainMvpView.getContext());
+        MyApplication application = MyApplication.get(getContext());
         SearchService searchService = application.getSearchService();
         subscription = searchService.searchPhotos(key, getPageIndex())
                 .doOnNext(response -> {
@@ -62,13 +88,16 @@ public class MainPresenter implements Presenter<MainMvpView> {
                     @Override
                     public void onCompleted() {
                         Log.i(TAG, "Search result: " + responseOfCurrentPage);
-                        if (!responseOfCurrentPage.getPhotos().isEmpty()) {
+                        List<Photo> photos = responseOfCurrentPage.getPhotos();
+                        if (!photos.isEmpty()) {
+                            allPhotoList.addAll(photos);
                             if (responseOfCurrentPage.isFirstPage()) {
-                                mainMvpView.setPhotos(responseOfCurrentPage.getPhotos());
+                                mainMvpView.setPhotos(photos);
                             } else {
-                                mainMvpView.appendPhotos(responseOfCurrentPage.getPhotos());
+                                mainMvpView.appendPhotos(photos);
                             }
                         } else {
+                            allPhotoList.clear();
                             mainMvpView.showMessage(R.string.no_result_found);
                         }
                         isLoading = false;

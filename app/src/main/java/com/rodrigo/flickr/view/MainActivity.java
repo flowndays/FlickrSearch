@@ -4,6 +4,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,7 +29,10 @@ import com.rodrigo.flickr.view.wedget.SwipeRefreshLayoutBottom;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainMvpView {
-
+    private static final String KEY_KEYWORD = "KEY_KEYWORD";
+    private static final String KEY_SWIPE_REFRESHING = "MainActivity.KEY_SWIPE_REFRESHING";
+    private static final String KEY_SHOWING_MESSAGE = "MainActivity.KEY_SHOWING_MESSAGE";
+    private static final String KEY_MESSAGE = "MainActivity.KEY_MESSAGE";
     private MainPresenter presenter;
     private TextView messageView;
     private RecyclerView resultGrid;
@@ -51,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new MainPresenter();
-        presenter.attachView(this);
+        presenter = initPresenter();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -71,6 +76,45 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+
+        if (savedInstanceState != null) {
+            restoreInstanceState(savedInstanceState);
+        } else {
+            // We don't start search by default, until user input a keyword, and start search,
+            // in which case onNewIntent() will be called. Note: this requires a SingleTop launchMode.
+        }
+    }
+
+    private void restoreInstanceState(Bundle savedInstanceState) {
+        keyword = savedInstanceState.getString(KEY_KEYWORD);
+        invalidateOptionsMenu();
+
+        boolean isRefreshing = savedInstanceState.getBoolean(KEY_SWIPE_REFRESHING);
+        if (isRefreshing) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        messageView.setText(savedInstanceState.getString(KEY_MESSAGE));
+        if (savedInstanceState.getBoolean(KEY_SHOWING_MESSAGE)) {
+            messageView.setVisibility(View.VISIBLE);
+        } else {
+            messageView.setVisibility(View.GONE);
+        }
+
+        photoAdapter.setPhotos(presenter.getAllPhotoList());
+    }
+
+    @NonNull
+    private MainPresenter initPresenter() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag(MainPresenter.TAG);
+        if (fragment != null) {
+            return (MainPresenter) fragment;
+        } else {
+            MainPresenter mainPresenter = new MainPresenter();
+            fragmentManager.beginTransaction().add(mainPresenter, MainPresenter.TAG).commit();
+            return mainPresenter;
+        }
     }
 
     private void setupResultGrid() {
@@ -100,6 +144,15 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_KEYWORD, keyword);
+        outState.putBoolean(KEY_SWIPE_REFRESHING, swipeRefreshLayout.isRefreshing());
+        outState.putBoolean(KEY_SHOWING_MESSAGE, messageView.getVisibility() == View.VISIBLE);
+        outState.putString(KEY_MESSAGE, messageView.getText().toString());
+    }
+
+    @Override
     public void appendPhotos(List<Photo> images) {
         photoAdapter.addPhotos(images);
         swipeRefreshLayout.setRefreshing(false);
@@ -125,11 +178,6 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     public void showProgressIndicator() {
         swipeRefreshLayout.setRefreshing(true);
         messageView.setVisibility(View.GONE);
-    }
-
-    @Override
-    public Context getContext() {
-        return this;
     }
 
     private class SearchHistoryListener implements SearchView.OnQueryTextListener {
