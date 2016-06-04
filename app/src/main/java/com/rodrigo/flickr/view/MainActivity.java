@@ -138,8 +138,11 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconified(TextUtils.isEmpty(keyword));
-
+        if (!TextUtils.isEmpty(keyword)) {
+            search.expandActionView();
+            searchView.setQuery(keyword, true);
+            searchView.clearFocus();
+        }
         return true;
     }
 
