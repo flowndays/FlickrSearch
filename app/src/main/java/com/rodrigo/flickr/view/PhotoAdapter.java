@@ -46,6 +46,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         if (fixedWidth > 0 && fixedHeight > 0) {
             requestCreator.resize(fixedWidth, fixedHeight);
         }
+        requestCreator.error(R.drawable.flickr);
         requestCreator.into(holder.imageView);
     }
 
