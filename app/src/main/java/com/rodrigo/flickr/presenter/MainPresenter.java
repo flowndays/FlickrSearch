@@ -13,7 +13,7 @@ import com.rodrigo.flickr.model.PhotosResponse;
 import com.rodrigo.flickr.model.SearchService;
 import com.rodrigo.flickr.view.MainMvpView;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Subscriber;
@@ -29,9 +29,15 @@ public class MainPresenter extends Fragment {
 
     private MainMvpView mainMvpView;
     private Subscription subscription;
-    private List<Photo> allPhotoList = new ArrayList<>();
-    private PhotosResponse responseOfCurrentPage;
     private boolean isLoading = false;
+
+    /*
+     * Keeps photos for all requests of specific keyword, for restoring Adapter items on rotation.
+     * If the keyword is changed, it should be set null.
+     */
+    private AllPhotosResponse allPhotosResponse;
+
+    private PhotosResponse lastPageResponse;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,26 +52,32 @@ public class MainPresenter extends Fragment {
     }
 
     @Override
-    public void onDetach() {
+    public void onDestroy() {
+        super.onDestroy();
         this.mainMvpView = null;
         if (subscription != null) {
             subscription.unsubscribe();
         }
-        super.onDetach();
     }
 
     public List<Photo> getAllPhotoList() {
-        return allPhotoList;
+        return allPhotosResponse == null
+               ? Collections.emptyList()
+               : allPhotosResponse.getAllPhotoList();
     }
 
-    public void resetPage() {
-        responseOfCurrentPage = null;
+    public void reset() {
+        allPhotosResponse = null;
+        lastPageResponse = null;
     }
 
     public void searchPhotos(String keyword) {
         String key = keyword.trim();
         if (key.isEmpty() || isLoading) {
             return;
+        }
+        if (allPhotosResponse != null && !keyword.equals(allPhotosResponse.getKeyword())) {
+            allPhotosResponse = null;
         }
 
         mainMvpView.showProgressIndicator();
@@ -87,17 +99,16 @@ public class MainPresenter extends Fragment {
                 .subscribe(new Subscriber<PhotosResponse>() {
                     @Override
                     public void onCompleted() {
-                        Log.i(TAG, "Search result: " + responseOfCurrentPage);
-                        List<Photo> photos = responseOfCurrentPage.getPhotos();
+                        Log.i(TAG, "onCompleted(), current page:" + lastPageResponse.getPage()
+                                + " for keyword:" + keyword);
+                        List<Photo> photos = lastPageResponse.getPhotos();
                         if (!photos.isEmpty()) {
-                            allPhotoList.addAll(photos);
-                            if (responseOfCurrentPage.isFirstPage()) {
+                            if (lastPageResponse.isFirstPage()) {
                                 mainMvpView.setPhotos(photos);
                             } else {
                                 mainMvpView.appendPhotos(photos);
                             }
                         } else {
-                            allPhotoList.clear();
                             mainMvpView.showMessage(R.string.no_result_found);
                         }
                         isLoading = false;
@@ -112,13 +123,19 @@ public class MainPresenter extends Fragment {
 
                     @Override
                     public void onNext(PhotosResponse newResponse) {
-                        responseOfCurrentPage = newResponse;
+                        if (allPhotosResponse == null) {
+                            allPhotosResponse = new AllPhotosResponse(keyword);
+                        }
+                        lastPageResponse = newResponse;
+                        allPhotosResponse.addPhotos(newResponse.getPhotos());
                     }
                 });
     }
 
     private int getPageIndex() {
-        return responseOfCurrentPage == null ? 0 : responseOfCurrentPage.nextPage();
+        return lastPageResponse == null
+               ? 1
+               : lastPageResponse.nextPage();
     }
 
 }

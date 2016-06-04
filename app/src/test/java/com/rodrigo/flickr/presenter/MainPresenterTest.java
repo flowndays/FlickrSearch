@@ -6,9 +6,8 @@ import com.rodrigo.flickr.R;
 import com.rodrigo.flickr.model.PhotosResponse;
 import com.rodrigo.flickr.model.SearchService;
 import com.rodrigo.flickr.util.MockModel;
-import com.rodrigo.flickr.view.MainMvpView;
+import com.rodrigo.flickr.view.MainActivity;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,14 +20,16 @@ import rx.schedulers.Schedulers;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class MainPresenterTest {
+    private static final String KEYWORD = "kittens";
     MainPresenter mainPresenter;
-    MainMvpView mainMvpView;
+    MainActivity mainMvpView;
     SearchService searchService;
 
     @Before
@@ -38,49 +39,44 @@ public class MainPresenterTest {
         application.setSearchService(searchService);
 
         application.setDefaultSubscribeScheduler(Schedulers.immediate());
-        mainPresenter = new MainPresenter();
-        mainMvpView = mock(MainMvpView.class);
-        when(mainMvpView.getContext()).thenReturn(application);
-        mainPresenter.attachView(mainMvpView);
-    }
-
-    @After
-    public void tearDown() {
-        mainPresenter.detachView();
+        mainPresenter = spy(new MainPresenter());
+        mainMvpView = mock(MainActivity.class);
+        when(mainPresenter.getContext()).thenReturn(application);
+        when(mainPresenter.getActivity()).thenReturn(mainMvpView);
+        mainPresenter.onAttach(application);
     }
 
     @Test
     public void searchPhotosShouldAppendPhotos_withResults() {
-        String keyword = "kittens";
-        PhotosResponse photosResponse = MockModel.mockSearchResult(10);
-        when(searchService.searchPhotos(keyword, 0))
+        PhotosResponse photosResponse = MockModel.mockSearchResult(10, 1);
+        when(searchService.searchPhotos(KEYWORD, 1))
                 .thenReturn(Observable.just(photosResponse));
 
-        mainPresenter.searchPhotos(keyword);
+        mainPresenter.searchPhotos(KEYWORD);
         verify(mainMvpView).showProgressIndicator();
-        verify(mainMvpView).appendPhotos(photosResponse.getPhotos());
+        verify(mainMvpView, never()).appendPhotos(photosResponse.getPhotos());
+        verify(mainMvpView).setPhotos(photosResponse.getPhotos());
     }
 
     @Test
     public void searchPhotosShouldShowMessage_withNoResult() {
-        String keyword = "kittens";
         PhotosResponse photosResponse = MockModel.mockEmptyResult();
-        when(searchService.searchPhotos(keyword, 0))
+        when(searchService.searchPhotos(KEYWORD, 1))
                 .thenReturn(Observable.just(photosResponse));
 
-        mainPresenter.searchPhotos(keyword);
+        mainPresenter.searchPhotos(KEYWORD);
         verify(mainMvpView).showProgressIndicator();
         verify(mainMvpView, never()).appendPhotos(photosResponse.getPhotos());
         verify(mainMvpView).showMessage(R.string.no_result_found);
     }
+
     @Test
     public void searchPhotosShouldShowErrorMessage_withError() {
-        String keyword = "kittens";
         PhotosResponse photosResponse = MockModel.mockErrorResult();
-        when(searchService.searchPhotos(keyword, 0))
+        when(searchService.searchPhotos(KEYWORD, 1))
                 .thenReturn(Observable.just(photosResponse));
 
-        mainPresenter.searchPhotos(keyword);
+        mainPresenter.searchPhotos(KEYWORD);
         verify(mainMvpView).showProgressIndicator();
         verify(mainMvpView, never()).appendPhotos(photosResponse.getPhotos());
         verify(mainMvpView).showMessage(R.string.error_searching_photoes);

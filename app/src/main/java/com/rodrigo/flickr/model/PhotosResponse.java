@@ -48,6 +48,10 @@ public class PhotosResponse {
         return isSucceed() && photos.pages > photos.page;
     }
 
+    public int getPage() {
+        return photos.page;
+    }
+
     public int nextPage() {
         if (!hasMore()) {
             throw new IllegalStateException("no more pages");

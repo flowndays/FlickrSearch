@@ -26,7 +26,7 @@ public class MockModel {
         return photosResponse;
     }
 
-    public static PhotosResponse mockSearchResult(int number) {
+    public static PhotosResponse mockSearchResult(int number, int page) {
         List<Photo> photos = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             photos.add(mock(Photo.class));
@@ -34,6 +34,10 @@ public class MockModel {
         PhotosResponse photosResponse = mock(PhotosResponse.class);
         when(photosResponse.isSucceed()).thenReturn(true);
         when(photosResponse.getPhotos()).thenReturn(photos);
+        when(photosResponse.isFirstPage()).thenReturn(page == 1);
+        when(photosResponse.hasMore()).thenReturn(true);
+        when(photosResponse.getPage()).thenReturn(page);
+        when(photosResponse.nextPage()).thenReturn(page + 1);
         return photosResponse;
     }
 

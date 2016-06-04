@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
             String newKeyword = intent.getStringExtra(SearchManager.QUERY);
             if (!newKeyword.equals(keyword)) {
                 keyword = newKeyword;
-                presenter.resetPage();
+                presenter.reset();
                 presenter.searchPhotos(keyword);
             }
         }
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = initPresenter();
+        presenter = setupPresenter();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     }
 
     @NonNull
-    private MainPresenter initPresenter() {
+    private MainPresenter setupPresenter() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(MainPresenter.TAG);
         if (fragment != null) {
