@@ -56,7 +56,7 @@ public class PhotosResponse {
     }
 
     public boolean isFirstPage() {
-        return photos.page == 0;
+        return photos.page == 1;
     }
 
     @NonNull

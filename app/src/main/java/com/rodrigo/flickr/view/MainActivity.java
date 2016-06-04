@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +36,19 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     private String keyword;
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String newKeyword = intent.getStringExtra(SearchManager.QUERY);
+            if (!newKeyword.equals(keyword)) {
+                keyword = newKeyword;
+                presenter.resetPage();
+                presenter.searchPhotos(keyword);
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new MainPresenter();
@@ -51,8 +65,12 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            presenter.resetPage();
-            presenter.searchPhotos(keyword);
+            if (!TextUtils.isEmpty(keyword)) {
+                presenter.resetPage();
+                presenter.searchPhotos(keyword);
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
 
         Intent intent = getIntent();
@@ -100,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconified(TextUtils.isEmpty(keyword));
 
         return true;
     }
