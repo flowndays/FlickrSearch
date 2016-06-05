@@ -2,6 +2,7 @@ package com.rodrigo.flickr.presenter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,6 +12,7 @@ import com.rodrigo.flickr.R;
 import com.rodrigo.flickr.model.Photo;
 import com.rodrigo.flickr.model.PhotosResponse;
 import com.rodrigo.flickr.model.SearchService;
+import com.rodrigo.flickr.model.SuggestionProvider;
 import com.rodrigo.flickr.view.MainMvpView;
 
 import java.util.Collections;
@@ -58,6 +60,12 @@ public class MainPresenter extends Fragment {
         if (subscription != null) {
             subscription.unsubscribe();
         }
+    }
+
+    public void saveSearchQuery(String query) {
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getContext(),
+                SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+        suggestions.saveRecentQuery(query, null);
     }
 
     public List<Photo> getAllPhotoList() {

@@ -47,7 +47,12 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String newKeyword = intent.getStringExtra(SearchManager.QUERY);
             if (!newKeyword.equals(keyword)) {
+                String query = intent.getStringExtra(SearchManager.QUERY);
+                presenter.saveSearchQuery(query);
+
                 keyword = newKeyword;
+                invalidateOptionsMenu();
+
                 presenter.reset();
                 presenter.searchPhotos(keyword);
             }

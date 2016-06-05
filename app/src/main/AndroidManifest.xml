@@ -29,6 +29,10 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
+
+        <provider
+            android:name=".model.SuggestionProvider"
+            android:authorities="com.rodrigo.flickr.model.SuggestionProvider"/>
     </application>
 
 </manifest>
