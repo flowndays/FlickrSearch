@@ -12,5 +12,7 @@ public interface MainMvpView {
 
     void showMessage(int stringId);
 
+    void showNoMoreResult();
+
     void showProgressIndicator();
 }

@@ -79,7 +79,7 @@ public class MainPresenterTest {
         mainPresenter.searchPhotos(KEYWORD);
         verify(mainMvpView).showProgressIndicator();
         verify(mainMvpView, never()).appendPhotos(photosResponse.getPhotos());
-        verify(mainMvpView).showMessage(R.string.error_searching_photoes);
+        verify(mainMvpView).showMessage(R.string.error_searching_photos);
     }
 
 }

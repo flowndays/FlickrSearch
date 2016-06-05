@@ -20,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rodrigo.flickr.R;
 import com.rodrigo.flickr.model.Photo;
@@ -52,11 +53,11 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
                 presenter.saveSearchQuery(query);
 
                 keyword = newKeyword;
-                invalidateOptionsMenu();
 
                 presenter.reset();
                 presenter.searchPhotos(keyword);
             }
+            invalidateOptionsMenu();
         }
     }
 
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
         if (!TextUtils.isEmpty(keyword)) {
             search.expandActionView();
-            searchView.setQuery(keyword, true);
+            searchView.setQuery(keyword, false);
             searchView.clearFocus();
         }
 
@@ -167,9 +168,19 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     }
 
     private void reset() {
+        keyword = null;
         presenter.reset();
         photoAdapter.setPhotos(Collections.emptyList());
         showMessage(R.string.search_from_action_menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.actionbar_clear) {
+            presenter.clearSearchHistory();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -198,9 +209,16 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
     @Override
     public void showMessage(int stringId) {
+        photoAdapter.setPhotos(Collections.emptyList());
         swipeRefreshLayout.setRefreshing(false);
         messageView.setVisibility(View.VISIBLE);
         messageView.setText(stringId);
+    }
+
+    @Override
+    public void showNoMoreResult() {
+        swipeRefreshLayout.setRefreshing(false);
+        Toast.makeText(this, R.string.no_more_result, Toast.LENGTH_SHORT).show();
     }
 
     @Override

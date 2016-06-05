@@ -68,6 +68,12 @@ public class MainPresenter extends Fragment {
         suggestions.saveRecentQuery(query, null);
     }
 
+    public void clearSearchHistory() {
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getContext(),
+                SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+        suggestions.clearHistory();
+    }
+
     public List<Photo> getAllPhotoList() {
         return allPhotosResponse == null
                ? Collections.emptyList()
@@ -91,6 +97,11 @@ public class MainPresenter extends Fragment {
         mainMvpView.showProgressIndicator();
         if (subscription != null) {
             subscription.unsubscribe();
+        }
+
+        if (lastPageResponse != null && !lastPageResponse.hasMore()) {
+            mainMvpView.showNoMoreResult();
+            return;
         }
 
         isLoading = true;
@@ -125,7 +136,7 @@ public class MainPresenter extends Fragment {
                     @Override
                     public void onError(Throwable error) {
                         Log.e(TAG, "Error searching photoes: ", error);
-                        mainMvpView.showMessage(R.string.error_searching_photoes);
+                        mainMvpView.showMessage(R.string.error_searching_photos);
                         isLoading = false;
                     }
 
@@ -145,5 +156,4 @@ public class MainPresenter extends Fragment {
                ? 1
                : lastPageResponse.nextPage();
     }
-
 }

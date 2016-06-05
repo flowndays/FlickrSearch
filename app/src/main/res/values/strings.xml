@@ -2,7 +2,9 @@
     <string name="app_name">FlickrSearch</string>
     <string name="search_from_action_menu">Please search from Action menu</string>
     <string name="no_result_found">No result is found</string>
-    <string name="error_searching_photoes">Oops, something went wrong</string>
+    <string name="error_searching_photos">Oops, something went wrong</string>
     <string name="search">search</string>
     <string name="search_hint">search photos</string>
+    <string name="clear_search_history">clear_search_history</string>
+    <string name="no_more_result">no more photos</string>
 </resources>
