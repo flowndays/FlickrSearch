@@ -36,5 +36,4 @@ captures/
 #Keystore files
 *.jks
 .DS_Store
-apk/
 app/libs/
