@@ -26,6 +26,7 @@ import com.rodrigo.flickr.model.Photo;
 import com.rodrigo.flickr.presenter.MainPresenter;
 import com.rodrigo.flickr.view.wedget.SwipeRefreshLayoutBottom;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainMvpView {
@@ -143,12 +144,32 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         if (!TextUtils.isEmpty(keyword)) {
             search.expandActionView();
             searchView.setQuery(keyword, true);
             searchView.clearFocus();
         }
+
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                reset();
+                return true;
+            }
+        });
         return true;
+    }
+
+    private void reset() {
+        presenter.reset();
+        photoAdapter.setPhotos(Collections.emptyList());
+        showMessage(R.string.search_from_action_menu);
     }
 
     @Override
