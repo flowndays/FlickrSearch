@@ -20,6 +20,8 @@ package com.rodrigo.flickr.view.wedget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -453,13 +455,30 @@ public class SwipeRefreshLayoutBottom extends ViewGroup {
     }
 
     /**
+     * @deprecated Use {@link #setProgressBackgroundColorSchemeResource(int)}
+     */
+    @Deprecated
+    public void setProgressBackgroundColor(int colorRes) {
+        setProgressBackgroundColorSchemeResource(colorRes);
+    }
+
+    /**
      * Set the background color of the progress spinner disc.
      *
      * @param colorRes Resource id of the color.
      */
-    public void setProgressBackgroundColor(int colorRes) {
-        mCircleView.setBackgroundColor(colorRes);
-        mProgress.setBackgroundColor(getResources().getColor(colorRes));
+    public void setProgressBackgroundColorSchemeResource(@ColorRes int colorRes) {
+        setProgressBackgroundColorSchemeColor(getResources().getColor(colorRes));
+    }
+
+    /**
+     * Set the background color of the progress spinner disc.
+     *
+     * @param color
+     */
+    public void setProgressBackgroundColorSchemeColor(@ColorInt int color) {
+        mCircleView.setBackgroundColor(color);
+        mProgress.setBackgroundColor(color);
     }
 
     /**

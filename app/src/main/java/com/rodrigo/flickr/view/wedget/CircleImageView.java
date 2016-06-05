@@ -17,7 +17,6 @@
 package com.rodrigo.flickr.view.wedget;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,7 +24,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.support.annotation.ColorRes;
 import android.support.v4.view.ViewCompat;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -112,11 +110,17 @@ class CircleImageView extends ImageView {
 
     /**
      * Update the background color of the circle image view.
+     *
+     * @param colorRes Id of a color resource.
      */
-    public void setBackgroundColor(@ColorRes int colorRes) {
+    public void setBackgroundColorRes(int colorRes) {
+        setBackgroundColor(getContext().getResources().getColor(colorRes));
+    }
+
+    @Override
+    public void setBackgroundColor(int color) {
         if (getBackground() instanceof ShapeDrawable) {
-            final Resources res = getResources();
-            ((ShapeDrawable) getBackground()).getPaint().setColor(res.getColor(colorRes));
+            ((ShapeDrawable) getBackground()).getPaint().setColor(color);
         }
     }
 
