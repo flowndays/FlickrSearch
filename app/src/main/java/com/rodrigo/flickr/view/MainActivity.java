@@ -185,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.actionbar_clear) {
             presenter.clearSearchHistory();
+            reset();
+            invalidateOptionsMenu();
             return true;
         }
         return super.onOptionsItemSelected(item);
