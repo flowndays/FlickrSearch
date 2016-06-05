@@ -1,6 +1,3 @@
-# Built application files
-*.apk
-*.ap_
 
 # Files for the Dalvik VM
 *.dex
@@ -38,3 +35,6 @@ captures/
 
 #Keystore files
 *.jks
+.DS_Store
+apk/
+app/libs/
