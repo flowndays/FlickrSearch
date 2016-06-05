@@ -136,6 +136,7 @@ public class MainPresenter extends Fragment {
                     @Override
                     public void onError(Throwable error) {
                         Log.e(TAG, "Error searching photoes: ", error);
+                        reset();
                         mainMvpView.showMessage(R.string.error_searching_photos);
                         isLoading = false;
                     }
