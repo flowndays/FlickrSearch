@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     private static final String KEY_SWIPE_REFRESHING = "MainActivity.KEY_SWIPE_REFRESHING";
     private static final String KEY_SHOWING_MESSAGE = "MainActivity.KEY_SHOWING_MESSAGE";
     private static final String KEY_MESSAGE = "MainActivity.KEY_MESSAGE";
+    private static final int SPAN_COUNT_PORTRAIT = 3;
+    private static final int SPAN_COUNT_LANDSCAPE = 4;
+
     private MainPresenter presenter;
     private TextView messageView;
     private RecyclerView resultGrid;
@@ -125,14 +128,18 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     }
 
     private void setupResultGrid() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
+        int spanCount = getResources().getBoolean(R.bool.isPortrait)
+                        ? SPAN_COUNT_PORTRAIT
+                        : SPAN_COUNT_LANDSCAPE;
+
+        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount, LinearLayoutManager.VERTICAL, false);
         resultGrid.setLayoutManager(layoutManager);
         photoAdapter = new PhotoAdapter();
         photoAdapter.setFixedSizeInPixels(
                 getResources().getDimensionPixelSize(R.dimen.photo_width),
                 getResources().getDimensionPixelSize(R.dimen.photo_height));
         resultGrid.setHasFixedSize(true);
-        resultGrid.addItemDecoration(new GridSpacingItemDecoration(3, 10));
+        resultGrid.addItemDecoration(new GridSpacingItemDecoration(spanCount, 10));
         resultGrid.setAdapter(photoAdapter);
     }
 
