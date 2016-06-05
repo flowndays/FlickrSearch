@@ -85,6 +85,12 @@ public class MainPresenter extends Fragment {
         lastPageResponse = null;
     }
 
+    /**
+     * Start search photos for given keyword. This class keeps auto-incrementing page index of
+     * results of the keyword. If there is not more pages, {@link MainMvpView#showNoMoreResult()}
+     * will be called.
+     * Search status will be reset when keyword is different from former ones.
+     */
     public void searchPhotos(String keyword) {
         String key = keyword.trim();
         if (key.isEmpty() || isLoading) {

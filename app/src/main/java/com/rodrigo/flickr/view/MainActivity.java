@@ -70,28 +70,18 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         presenter = setupPresenter();
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         resultGrid = (RecyclerView) findViewById(R.id.search_result_grid);
         setupResultGrid();
+        setupSwipeRefreshLayout();
         messageView = (TextView) findViewById(R.id.message);
-
-        swipeRefreshLayout = (SwipeRefreshLayoutBottom) findViewById(R.id.swiperefresh);
-        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            if (!TextUtils.isEmpty(keyword)) {
-                presenter.searchPhotos(keyword);
-            } else {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
 
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState);
         } else {
-            // We don't start search by default, until user input a keyword, and start search,
-            // in which case onNewIntent() will be called. Note: this requires a SingleTop launchMode.
+            // By default, no search is executed. When user input in SearchView and start
+            // searching, onNewIntent() will be called. Note: this requires a SingleTop launchMode.
         }
     }
 
@@ -143,23 +133,35 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         resultGrid.setAdapter(photoAdapter);
     }
 
+    private void setupSwipeRefreshLayout() {
+        swipeRefreshLayout = (SwipeRefreshLayoutBottom) findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (!TextUtils.isEmpty(keyword)) {
+                presenter.searchPhotos(keyword);
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.actionbar_main, menu);
 
-        MenuItem search = menu.findItem(R.id.actionbar_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        MenuItem searchItem = menu.findItem(R.id.actionbar_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         if (!TextUtils.isEmpty(keyword)) {
-            search.expandActionView();
+            searchItem.expandActionView();
             searchView.setQuery(keyword, false);
             searchView.clearFocus();
         }
 
-        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 return true;
@@ -202,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
     }
 
     @Override
-    public void appendPhotos(List<Photo> images) {
-        photoAdapter.addPhotos(images);
+    public void appendPhotos(List<Photo> photos) {
+        photoAdapter.addPhotos(photos);
         swipeRefreshLayout.setRefreshing(false);
         messageView.setVisibility(View.GONE);
     }

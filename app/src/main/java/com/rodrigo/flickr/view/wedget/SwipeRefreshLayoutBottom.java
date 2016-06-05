@@ -36,6 +36,10 @@ import android.view.animation.Transformation;
 import android.widget.AbsListView;
 
 /**
+ * SwipeRefreshLayoutBottom is a control for Android apps that lets a user "pull up" from the
+ * bottom of content (usually a list) to refresh or load more items.
+ * It is a mirror of Android's SwipeRefreshLayout control.
+ *
  * The SwipeRefreshLayout should be used whenever the user can refresh the
  * contents of a view via a vertical swipe gesture. The activity that
  * instantiates this view should add an OnRefreshListener to be notified
