@@ -209,15 +209,4 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
         messageView.setVisibility(View.GONE);
     }
 
-    private class SearchHistoryListener implements SearchView.OnQueryTextListener {
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextChange(String newText) {
-            return false;
-        }
-    }
 }
