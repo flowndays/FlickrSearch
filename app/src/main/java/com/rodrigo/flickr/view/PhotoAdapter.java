@@ -1,10 +1,14 @@
 package com.rodrigo.flickr.view;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
 import com.rodrigo.flickr.R;
@@ -13,12 +17,24 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
     private final List<Photo> photoList = new ArrayList<>();
+    private static final int ANIMATION_DURATION = 300;
+    private static final Interpolator mInterpolator = new LinearInterpolator();
+
     private int fixedWidth;
     private int fixedHeight;
+
+    private int lastPosition = -1;
+    private LinkedList<AnimatorSet> animationQueue = new LinkedList<>();
+    private int columnCount = 3;
+
+    public PhotoAdapter(int columnCount) {
+        this.columnCount = columnCount;
+    }
 
     public void setFixedSizeInPixels(int fixedWidth, int fixedHeight) {
         this.fixedWidth = fixedWidth;
@@ -54,6 +70,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         }
         requestCreator.error(R.drawable.flickr);
         requestCreator.into(holder.imageView);
+
+        showAnimation(holder, holder.getAdapterPosition());
     }
 
     private String createPhotoUrl(Photo photo) {
@@ -73,5 +91,40 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.photo_image_view);
         }
+    }
+
+    private void showAnimation(RecyclerView.ViewHolder viewHolder, int position) {
+        if (position > lastPosition) {
+            showAnimationsInQueue(getBottomAnimators(viewHolder.itemView));
+            lastPosition = position;
+        } else if (position < lastPosition) {
+            showAnimationsInQueue(getTopAnimators(viewHolder.itemView));
+            lastPosition = position;
+        }
+    }
+
+    private AnimatorSet getBottomAnimators(View view) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(ObjectAnimator.ofFloat(view, "alpha", 0f, 1f), ObjectAnimator.ofFloat(view, "translationY", view.getMeasuredHeight(), 0));
+        return animatorSet;
+    }
+
+    private AnimatorSet getTopAnimators(final View view) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(ObjectAnimator.ofFloat(view, "alpha", 0f, 1f), ObjectAnimator.ofFloat(view, "translationY", -view.getMeasuredHeight(), 0));
+        return animatorSet;
+    }
+
+    /**
+     * Only show animations of the last {@link this#columnCount} items. Former animations will be
+     * ended.
+     */
+    private void showAnimationsInQueue(AnimatorSet animators) {
+        if (animationQueue.size() >= columnCount) {
+            animationQueue.removeFirst().end();
+        }
+        animationQueue.addLast(animators);
+        animators.setDuration(ANIMATION_DURATION).start();
+        animators.setInterpolator(mInterpolator);
     }
 }

@@ -12,7 +12,7 @@ public interface SearchService {
     String API_KEY = "3e7cc266ae2b0e0d78e279ce8e361736";
 
     @GET("services/rest/?method=flickr.photos.search&api_key=" + API_KEY +
-            "&format=json&nojsoncallback=1&per_page=99")
+            "&format=json&nojsoncallback=1&per_page=90")
     Observable<PhotosResponse> searchPhotos(@Query("text") String keyword,
                                             @Query("page") int page);
 

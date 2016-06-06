@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount, LinearLayoutManager.VERTICAL, false);
         resultGrid.setLayoutManager(layoutManager);
-        photoAdapter = new PhotoAdapter();
+        photoAdapter = new PhotoAdapter(spanCount);
         photoAdapter.setFixedSizeInPixels(
                 getResources().getDimensionPixelSize(R.dimen.photo_width),
                 getResources().getDimensionPixelSize(R.dimen.photo_height));
