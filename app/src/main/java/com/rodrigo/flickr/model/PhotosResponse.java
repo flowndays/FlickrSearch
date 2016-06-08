@@ -41,14 +41,15 @@ public class PhotosResponse {
     }
 
     public boolean isSucceed() {
-        return status.equals("ok");
+        return "ok".equals(status);
     }
 
     public boolean hasMore() {
-        return isSucceed() && photos.pages > photos.page;
+        return isSucceed() && photos != null && photos.pages > photos.page;
     }
 
     public int getPage() {
+        assertPhotosNonNull();
         return photos.page;
     }
 
@@ -60,11 +61,22 @@ public class PhotosResponse {
     }
 
     public boolean isFirstPage() {
+        assertPhotosNonNull();
         return photos.page == 1;
+    }
+
+    private void assertPhotosNonNull() {
+        if (photos == null) {
+            throw new IllegalStateException("photos is null");
+        }
     }
 
     @NonNull
     public List<Photo> getPhotos() {
-        return photos.photoList == null ? Collections.emptyList() : photos.photoList;
+        if (photos == null || photos.photoList == null) {
+            return Collections.emptyList();
+        } else {
+            return photos.photoList;
+        }
     }
 }
