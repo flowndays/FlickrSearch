@@ -31,7 +31,7 @@ A SearchView inside the ToolBar is the entrance of searching function. It uses a
 
 When user presses enter key in the soft keyboard, the SearchView sends an Intent with action Intent.ACTION_SEARCH to MainActivity, to avoid initialising multi instances, I made the launchMode of MainActivity singleTop.
 
-The RecyclerView is wrapped by a [SwipeRefreshLayoutBottom], which is changed from [SwipeRefreshLayout] in Android source code. It is shown in the bottom instead of top of the screen, and applied to vertical-reversed animations. It provides auto fetching more feature to the RecyclerView.
+The RecyclerView is wrapped by a [SwipeRefreshLayoutBottom], which is changed from [SwipeRefreshLayout](https://developer.android.com/reference/android/support/v4/widget/SwipeRefreshLayout.html) in Android source code. It is shown in the bottom instead of top of the screen, and applied to vertical-reversed animations. It provides auto fetching more feature to the RecyclerView.
 
 Some basic entering animations are applied to grid items, and I used a fixed-size queue to make sure only the last few items will show animations.
 
