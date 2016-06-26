@@ -9,17 +9,17 @@ import java.util.List;
 
 public class PhotosResponse {
     @SerializedName("photos")
-    private final Photos photos;
+    private final PhotosMeta photosMeta;
 
     @SerializedName("stat")
     private final String status;
 
-    private PhotosResponse(Photos photphotoses, String status) {
-        this.photos = photphotoses;
+    private PhotosResponse(PhotosMeta photosMeta, String status) {
+        this.photosMeta = photosMeta;
         this.status = status;
     }
 
-    private class Photos {
+    private class PhotosMeta {
         @SerializedName("page")
         final int page;
         @SerializedName("pages")
@@ -31,7 +31,7 @@ public class PhotosResponse {
         @SerializedName("photo")
         final List<Photo> photoList;
 
-        private Photos(int page, int pages, int perpage, int total, List<Photo> list) {
+        private PhotosMeta(int page, int pages, int perpage, int total, List<Photo> list) {
             this.page = page;
             this.pages = pages;
             this.perpage = perpage;
@@ -45,38 +45,38 @@ public class PhotosResponse {
     }
 
     public boolean hasMore() {
-        return isSucceed() && photos != null && photos.pages > photos.page;
+        return isSucceed() && photosMeta != null && photosMeta.pages > photosMeta.page;
     }
 
     public int getPage() {
         assertPhotosNonNull();
-        return photos.page;
+        return photosMeta.page;
     }
 
     public int nextPage() {
         if (!hasMore()) {
             throw new IllegalStateException("no more pages");
         }
-        return photos.page + 1;
+        return photosMeta.page + 1;
     }
 
     public boolean isFirstPage() {
         assertPhotosNonNull();
-        return photos.page == 1;
+        return photosMeta.page == 1;
     }
 
     private void assertPhotosNonNull() {
-        if (photos == null) {
+        if (photosMeta == null) {
             throw new IllegalStateException("photos is null");
         }
     }
 
     @NonNull
     public List<Photo> getPhotos() {
-        if (photos == null || photos.photoList == null) {
+        if (photosMeta == null || photosMeta.photoList == null) {
             return Collections.emptyList();
         } else {
-            return photos.photoList;
+            return photosMeta.photoList;
         }
     }
 }
