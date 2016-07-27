@@ -124,13 +124,17 @@ public class MainActivity extends AppCompatActivity implements MainMvpView {
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount, LinearLayoutManager.VERTICAL, false);
         resultGrid.setLayoutManager(layoutManager);
-        photoAdapter = new PhotoAdapter(spanCount);
+        photoAdapter = new PhotoAdapter(getPhotoClickListener(), spanCount);
         photoAdapter.setFixedSizeInPixels(
                 getResources().getDimensionPixelSize(R.dimen.photo_width),
                 getResources().getDimensionPixelSize(R.dimen.photo_height));
         resultGrid.setHasFixedSize(true);
         resultGrid.addItemDecoration(new GridSpacingItemDecoration(spanCount, 10));
         resultGrid.setAdapter(photoAdapter);
+    }
+
+    private PhotoAdapter.PhotoClickAction getPhotoClickListener() {
+        return photo -> PhotoDetailActivity.start(MainActivity.this, photo);
     }
 
     private void setupSwipeRefreshLayout() {

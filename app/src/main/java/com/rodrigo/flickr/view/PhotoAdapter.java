@@ -3,6 +3,7 @@ package com.rodrigo.flickr.view;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +32,20 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     private int lastPosition = -1;
     private LinkedList<AnimatorSet> animationQueue = new LinkedList<>();
     private int columnCount = 3;
+    private PhotoClickAction clickAction;
 
-    public PhotoAdapter(int columnCount) {
+    public interface PhotoClickAction {
+        void onPhotoClicked(Photo photo);
+    }
+
+    private View.OnClickListener itemClickListener = view -> {
+        Photo photo = (Photo) view.getTag();
+        clickAction.onPhotoClicked(photo);
+    };
+
+    public PhotoAdapter(@NonNull PhotoClickAction clickAction, int columnCount) {
         this.columnCount = columnCount;
+        this.clickAction = clickAction;
     }
 
     public void setFixedSizeInPixels(int fixedWidth, int fixedHeight) {
@@ -57,6 +69,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         final View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.photo_item, parent, false);
         final PhotoViewHolder viewHolder = new PhotoViewHolder(itemView);
+
+        viewHolder.itemView.setOnClickListener(itemClickListener);
         return viewHolder;
     }
     
@@ -72,9 +86,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         requestCreator.into(holder.imageView);
 
         showAnimation(holder, holder.getAdapterPosition());
+
+        holder.itemView.setTag(photo);
     }
 
-    private String createPhotoUrl(Photo photo) {
+
+    public static String createPhotoUrl(Photo photo) {
         return String.format("http://farm%s.static.flickr.com/%s/%s_%s.jpg", photo.getFarm(),
                 photo.getServer(), photo.getId(), photo.getSecret());
     }

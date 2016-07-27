@@ -30,6 +30,8 @@
                 android:resource="@xml/searchable"/>
         </activity>
 
+        <activity android:name=".view.PhotoDetailActivity"/>
+
         <provider
             android:name=".model.SuggestionProvider"
             android:authorities="com.rodrigo.flickr.model.SuggestionProvider"/>
